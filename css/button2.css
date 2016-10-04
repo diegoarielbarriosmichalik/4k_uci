@@ -1,0 +1,127 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 02/02/2014, 11:50:45 PM
+    Author     : Dell
+*/
+
+/***** Normal Button Style *****/
+.tbutton {
+	border: 1px solid rgba(0,0,0,0.2);
+	box-sizing: content-box !important;
+	color: #f5f5f5;
+	cursor: pointer;
+	display: inline-block;
+	padding: 6px 10px;
+	text-align: center;
+	text-shadow: 0 0 5px rgba(0,0,0,0.2), 0 0 1px rgba(0,0,0,0.4);
+	text-decoration: none;
+	font-size: 12px;
+	font-family: 'Calibri';
+	white-space: normal;
+	outline: none; 
+
+	/* Transition */
+	-moz-transition: all 200ms ease 0ms !important;
+	-o-transition: all 200ms ease 0ms !important;
+	-webkit-transition: all 200ms ease 0ms !important;
+
+	/* Background Color */
+	background: none repeat scroll 0 0 rgba(255,255,255,0.04);
+
+	/* Border Rounding */
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+
+	/* Background Clipping */
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding;
+	background-clip: padding-box;
+	
+	/* Shadow */
+	box-shadow: 0 0 3px rgba(255,255,255,0.25) inset, 0 0 1px rgba(255,255,255,0.2), 0 10px 10px rgba(255,255,255,0.08) inset;
+	-moz-box-shadow: 0 0 3px rgba(255,255,255,0.25) inset, 0 0 1px rgba(255,255,255,0.2), 0 10px 10px rgba(255,255,255,0.08) inset;
+	-webkit-box-shadow: 0 0 3px rgba(255,255,255,0.25) inset, 0 0 1px rgba(255,255,255,0.2), 0 10x 10px rgba(255,255,255,0.08) inset;
+	box-shadow: 0 0 3px rgba(255,255,255,0.25) inset, 0 0 1px rgba(255,255,255,0.2), 0 10px 10px rgba(255,255,255,0.08) inset;
+}
+
+input[type='submit'].tbutton, input[type='button'].tbutton, tbutton.tbutton {
+	/* Padding Fix */
+	padding: 5px 10px;
+}
+
+/***** Hovered Button *****/
+.tbutton:hover {
+	color: #fff;
+	text-shadow: 0 0 5px rgba(0,0,0,0.2), 0 0 1px rgba(0,0,0,0.4);
+	
+	/* Shadow */
+	box-shadow: 0 0 5px rgba(255,255,255,0.45) inset, 0 0 1px rgba(255,255,255,0.2), 0 10px 10px rgba(255,255,255,0.08) inset;
+	-moz-box-shadow: 0 0 5px rgba(255,255,255,0.45) inset, 0 0 1px rgba(255,255,255,0.2), 0 10px 10px rgba(255,255,255,0.08) inset;
+	-webkit-box-shadow: 0 0 5px rgba(255,255,255,0.45) inset, 0 0 1px rgba(255,255,255,0.2), 0 10px 10px rgba(255,255,255,0.08) inset;
+ }
+
+
+/***** Clicked Button *****/
+.tbutton:active {
+	color: #eee;
+
+	/* Shadow */
+	box-shadow: 0 0 5px rgba(255,255,255,0.1) inset, 0 0 1px rgba(255,255,255,0.2), 0 0 4px rgba(0,0,0,0.4) inset, 0 10px 10px rgba(255,255,255,0.08) inset;
+	-moz-box-shadow: 0 0 5px rgba(255,255,255,0.1) inset, 0 0 1px rgba(255,255,255,0.2), 0 0 4px rgba(0,0,0,0.4) inset, 0 10px 10px rgba(255,255,255,0.08) inset;
+	-webkit-box-shadow: 0 0 5px rgba(255,255,255,0.1) inset, 0 0 1px rgba(255,255,255,0.2), 0 0 4px rgba(0,0,0,0.4) inset, 0 10px 10px rgba(255,255,255,0.08) inset;
+ }
+
+
+/***** Combined Buttons *****/
+.tsc_toolbar > li {
+	display: inline-block;
+	margin: 0;
+}
+
+.tsc_toolbar > li > .button {
+
+	border-left: rgba(0,0,0,0.2);
+
+	/* Border Rounding */
+	border-radius: 0px;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+}
+
+.tsc_toolbar > li:first-child > .tbutton {
+	border-left: 1px solid rgba(0,0,0,0.2);
+
+	/* Border Rounding */
+	border-radius: 3px 0 0 3px; 
+	-moz-border-radius: 3px 0 0 3px; 
+	-webkit-border-radius: 3px 0 0 3px;
+}
+
+.tsc_toolbar > li:last-child > .tbutton{
+	border-left: 0;
+
+	/* Border Rounding */
+	border-radius: 0 3px 3px 0;
+	-moz-border-radius: 0 3px 3px 0;
+	-webkit-border-radius: 0 3px 3px 0;
+}
+
+
+/***** Icon Images *****/
+.tbutton.addcart {
+background-image: url('../images/cart_add.png'); }
+
+.tbutton.delcart {
+background-image: url('../images/cart_delete.png'); }
+
+
+/***** Icon *****/
+.tbutton.icon {
+text-indent: 16px;
+background-position: 6px center;
+background-repeat: no-repeat; }
