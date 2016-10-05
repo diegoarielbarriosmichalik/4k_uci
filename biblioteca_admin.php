@@ -139,25 +139,8 @@ if ($ok == 1) {
                                     <br>
                                     <br>
 
+                                    <input type="file" name="image"  required="" />
 
-                                <!--                                        <strong> Carátula </strong>
-                                     <input type="text" size="63"  name="imagen" required=""   > 
-
-                                     <input type="submit" value="Buscar imagen" />-->
-
-
-                                    <!-- MAX_FILE_SIZE debe preceder al campo de entrada del fichero -->
-        <!--                                <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
-                                     El nombre del elemento de entrada determina el nombre en el array $_FILES 
-                                    Carátula: <input name="fichero_usuario" type="file" />
-                                    <input type="submit" value="Enviar fichero" />-->
-
-
-                <!--                                    <input type="file" name="fileToUpload" id="fileToUpload">
-                                                    <input type="submit" value="Upload Image" name="submit">-->
-
-                                    <input type="file" name="image" />
-                                    <input type="submit"/>
                                     <br>
                                     <br>
                                     <input type="submit" value="Guardar" />
