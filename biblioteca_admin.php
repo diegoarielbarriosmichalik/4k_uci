@@ -86,7 +86,7 @@ if ($ok == 1) {
                         </div>
                     </div>
                     <br>
-                    <form action="biblioteca.php" method="post">
+                    <form action="biblioteca_admin.php" method="post">
                         <div class="input-group input-group-sm">
                             <input type="text" name="buscar" autofocus placeholder="Buscar libro..." class="form-control">
                             <span class="input-group-btn">
@@ -110,49 +110,55 @@ if ($ok == 1) {
 
                             <div class="gallery-bott">
 
-                                <form action="libro_save.php" method="post" name="formulario">
+                                <form enctype="multipart/form-data" action="libro_save.php" method="POST">
+                                    <!--<form action="" method="post" name="formulario">-->
 
-                                    <fieldset> 
-                                        <br>
-                                        I.S.B.N.
-                                        <input name="isbn" type="text" size="80" required="" placeholder="Ingrese ISBN"/> 
-                                        <br>
-                                        <br>
-                                        Titulo
-                                        <input type="text"   name="titulo"  size="81" required="" placeholder="Ingrese un titulo">
-                                        <br>
-                                        <br>
-                                        Descripcion
-                                        <input type="text" name="subtitulo" size="75" required="" placeholder="" >
-                                        <br>
-                                        <br>
-                                        Año
-                                        <input type="number"   name="anio"  size="80" required="" >
 
-                                        Cantidad de Paginas
-                                        <input type="number"   name="paginas" required=""  size="80" >
-                                        <br>
-                                        <br>
+                                    <strong> I.S.B.N.&nbsp; </strong> <input name="isbn" type="text" size="80" required="" placeholder="Ingrese ISBN"/> 
+                                    <br>
+                                    <br>
+                                    <strong> Título &nbsp; </strong>
+                                    <input type="text"   name="titulo"  size="80" required="" placeholder="Ingrese un titulo">
+                                    <br>
+                                    <br>
+                                    <strong> Descripción </strong>
+                                    <input type="text" name="subtitulo" size="76" required="" placeholder="" >
+                                    <br>
+                                    <br>
 
-                                        Categoria
-                                        <select name="id_categoria" required="">
-                                            <option value="1" >Categoria 1</option>
-                                        </select>
 
-                                        Autor
-                                        <select name="id_autor" required="">
-                                            <option value="" >Elija un autor</option>
-                                            <option value="1" >Autor 1</option>
-                                        </select>
+                                    <strong> Autor </strong>
+                                    <select name="id_autor" required="">
+                                        <option value="" >Elija un autor</option>
+                                        <option value="1" >Autor 1</option>
+                                    </select>
+                                    <br>
+                                    <br>
+                                    <strong> Nro. de Páginas </strong>
+                                    <input type="number"   name="paginas" required=""  >
+                                    <br>
+                                    <br>
 
-                                        Editorial
-                                        <select name="id_editorial" required="">
-                                            <option value="" >Elija una editorial</option>
-                                            <option value="1" >Editorial 1</option>
-                                        </select>
-                                        <br>
-                                        <br>
-                                    </fieldset>
+
+                                <!--                                        <strong> Carátula </strong>
+                                     <input type="text" size="63"  name="imagen" required=""   > 
+
+                                     <input type="submit" value="Buscar imagen" />-->
+
+
+                                    <!-- MAX_FILE_SIZE debe preceder al campo de entrada del fichero -->
+        <!--                                <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
+                                     El nombre del elemento de entrada determina el nombre en el array $_FILES 
+                                    Carátula: <input name="fichero_usuario" type="file" />
+                                    <input type="submit" value="Enviar fichero" />-->
+
+
+                <!--                                    <input type="file" name="fileToUpload" id="fileToUpload">
+                                                    <input type="submit" value="Upload Image" name="submit">-->
+
+                                    <input type="file" name="image" />
+                                    <input type="submit"/>
+                                    <br>
                                     <br>
                                     <input type="submit" value="Guardar" />
                                     <br>
@@ -181,15 +187,10 @@ if ($ok == 1) {
                                 $contenido = !empty($_POST['buscar']) ? $_POST['buscar'] : '';
                                 if ($contenido != null) {
 
-
-
                                     $dbh = new PDO('pgsql:host=localhost;port=5432;dbname=biblioteca;user=postgres;password=postgres');
                                     foreach ($dbh->query("SELECT * from libro inner join editorial on editorial.id_editorial = libro.id_editorial where titulo ilike '%$contenido%' ") as $fila) {
                                         ?>
-
                                         <div class="col-md-4 col1 gallery-grid">
-                                            <!--<a href="images/g1.jpg" rel="title" class="b-link-stripe b-animate-go  thickbox">-->
-
                                             <figure class="effect-bubba">
                                                 <img class="img-responsive" src="images/<?php echo $fila['id_libro']; ?>.jpg" alt="">
                                                 <figcaption>
