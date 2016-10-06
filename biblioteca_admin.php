@@ -1,5 +1,15 @@
 
 <?php
+
+function f_remove_odd_characters($string) {
+    $string = str_replace("\n", "[NEWLINE]", $string);
+    $string = htmlentities($string);
+    $string = preg_replace('/[^(\x20-\x7F)]*/', '', $string);
+    $string = html_entity_decode($string);
+    $string = str_replace("[NEWLINE]", "\n", $string);
+    return $string;
+}
+
 $ok = null;
 session_start();
 if ($_SESSION['last_access'] == "1") {
@@ -172,19 +182,38 @@ if ($ok == 1) {
 
                                     $dbh = new PDO('pgsql:host=localhost;port=5432;dbname=biblioteca;user=postgres;password=postgres');
                                     foreach ($dbh->query("SELECT * from libro inner join editorial on editorial.id_editorial = libro.id_editorial where titulo ilike '%$contenido%' ") as $fila) {
-                                        ?>
-                                        <div class="col-md-4 col1 gallery-grid">
-                                            <figure class="effect-bubba">
-                                                <img class="img-responsive" src="images/<?php echo $fila['id_libro']; ?>.jpg" alt="">
-                                                <figcaption>
-                                                    <h4 class="gal"><?php echo $fila['titulo']; ?></h4>
-                                                    <p class="gal1">ISBN: <?php echo $fila['isbn']; ?></p>	
-                                                    <p class="gal1">Editorial: <?php echo $fila['nombre']; ?></p>	
-                                                    <p class="gal1"><?php echo $fila['num_pag']; ?>  Pag. </p>	
-                                                </figcaption>			
-                                            </figure>
-                                        </div>
-                                        <?php
+                                        $id = $fila['id_libro'];
+                                        $exif = exif_read_data("images/".$id.".jpg", 'IFD0');
+                                        $exif = exif_read_data("images/".$id.".jpg", 0, true);
+                                        foreach ($exif as $clave => $sección) {
+                                            foreach ($sección as $nombre => $var) {
+                                                if (is_string($var)) {
+                                                    $nuevo = f_remove_odd_characters($var);
+//                                                    if ($nuevo == $contenido) {
+//                                                        echo "YES <br>";
+//                                                    }
+                                                    $resultado = strpos($nuevo, $contenido);
+                                                    if ($resultado !== FALSE) {
+//                                                        echo $nuevo. $nombre . "<br>";
+                                                        ?>
+                                                        <div class="col-md-4 col1 gallery-grid">
+                                                            <figure class="effect-bubba">
+                                                                <img class="img-responsive" src="images/<?php echo $fila['id_libro']; ?>.jpg" alt="">
+                                                                <figcaption>
+                                                                    <h4 class="gal"><?php echo $fila['titulo']; ?></h4>
+                                                                    <p class="gal1">ISBN: <?php echo $fila['isbn']; ?></p>	
+                                                                    <p class="gal1">Editorial: <?php echo $fila['nombre']; ?></p>	
+                                                                    <p class="gal1"><?php echo $fila['num_pag']; ?>  Pag. </p>	
+                                                                </figcaption>			
+                                                            </figure>
+                                                        </div>
+                                                        <?php
+                                                    }
+
+                                                    $nuevo = "";
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                                 ?>
