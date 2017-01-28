@@ -33,53 +33,147 @@ $q = !empty($_GET['q']) ? $_GET['q'] : '';
 if ($ok == 1) {
     ?>
     <!DOCTYPE HTML>
-    <html>
+    <html lang="en">
         <head>
-            <script src="ajax.js"></script>
+            <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+            <link rel="stylesheet" href="/resources/demos/style.css">
+            <style>
+                label, input { display:block; }
+                input.text { margin-bottom:12px; width:95%; padding: .4em; }
+                fieldset { padding:0; border:0; margin-top:25px; }
+                h1 { font-size: 1.2em; margin: .6em 0; }
+                div#users-contain { width: 350px; margin: 20px 0; }
+                div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
+                div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
+                .ui-dialog .ui-state-error { padding: .3em; }
+                .validateTips { border: 1px solid transparent; padding: 0.3em; }
+            </style>
+            <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-            <title>Biblioteca</title>
-            <link href = "css2/bootstrap.css" rel = "stylesheet" type = "text/css" media = "all">
-            <script src="js/jquery-1.11.0.min.js"></script>
-            <link href="css2/style.css" rel="stylesheet" type="text/css" media="all"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-            <meta name="keywords" content="" />
-            <script type="application/x-javascript"> 
-                addEventListener("load", 
-                function() { setTimeout(hideURLbar, 0); }, 
-                false); 
-                function hideURLbar(){ 
-                window.scrollTo(0,1); 
-                } 
-            </script>
-            <link href='//fonts.googleapis.com/css?family=Asap:400,700' rel='stylesheet' type='text/css'>
-            <link href = '//fonts.googleapis.com/css?family=Kreon:400,700,300' rel = 'stylesheet' type = 'text/css'>
-            <script type = "text/javascript" src = "js/move-top.js"></script>
-            <script type="text/javascript" src="js/easing.js"></script>
-            <script type="text/javascript">
-                jQuery(document).ready(function ($) {
-                    $(".scroll").click(function (event) {
+
+            <script>
+
+                $(function () {
+                    var dialog, form,
+                            // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
+                            emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+                            name = $("#name"),
+                            email = $("#email"),
+                            password = $("#password"),
+                            allFields = $([]).add(name).add(email).add(password),
+                            tips = $(".validateTips");
+                    function updateTips(t) {
+                        tips
+                                .text(t)
+                                .addClass("ui-state-highlight");
+                        setTimeout(function () {
+                            tips.removeClass("ui-state-highlight", 1500);
+                        }, 500);
+                    }
+
+                    function checkLength(o, n, min, max) {
+                        if (o.val().length > max || o.val().length < min) {
+                            o.addClass("ui-state-error");
+                            updateTips("Length of " + n + " must be between " +
+                                    min + " and " + max + ".");
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+
+                    function checkRegexp(o, regexp, n) {
+                        if (!(regexp.test(o.val()))) {
+                            o.addClass("ui-state-error");
+                            updateTips(n);
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+
+                    function addUser() {
+                        var valid = true;
+                        allFields.removeClass("ui-state-error");
+                        valid = valid && checkLength(name, "username", 3, 16);
+    //                        valid = valid && checkLength(email, "email", 6, 80);
+    //                        valid = valid && checkLength(password, "password", 5, 16);
+
+                        valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter.");
+    //                        valid = valid && checkRegexp(email, emailRegex, "eg. ui@jquery.com");
+    //                        valid = valid && checkRegexp(password, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9");
+
+                        if (valid) {
+                            $("#users tbody").append("<tr>" +
+                                    "<td>" + name.val() + "</td>" +
+                                    "</tr>");
+                            dialog.dialog("close");
+                        }
+
+                        return valid;
+                    }
+
+                    function Autor_guardar() {
+
+                        var valid = true;
+                        allFields.removeClass("ui-state-error");
+                        valid = valid && checkLength(name, "username", 3, 16);
+                        valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter.");
+                        if (valid) {
+                            $.ajax({
+                                type: "POST",
+                                url: "Autor_guardar.php",
+                                data: {nombre: name.val()}
+                            })
+                            load_autor2("0");
+                            dialog.dialog("close");
+                        }
+
+
+                    }
+
+                    dialog = $("#dialog-form").dialog({
+                        autoOpen: false,
+                        height: 400,
+                        width: 350,
+                        modal: true,
+                        buttons: {
+                            "Crear autor": Autor_guardar,
+                            Cancel: function () {
+                                dialog.dialog("close");
+                            }
+                        },
+                        close: function () {
+                            form[ 0 ].reset();
+                            allFields.removeClass("ui-state-error");
+                        }
+                    });
+                    form = dialog.find("form").on("submit", function (event) {
                         event.preventDefault();
-                        $('html,body').animate({scrollTop: $(this.hash).offset().top}, 1000);
+                        addUser();
+                    });
+                    $("#create-user").button().on("click", function () {
+                        dialog.dialog("open");
                     });
                 });
             </script>
-            <!-- //end-smoth-scrolling -->
-            <!--light-box-files -->
-            <script src="js/jquery.chocolat.js"></script>
-            <link rel="stylesheet" href="css/chocolat.css" type="text/css" media="screen" charset="utf-8">
-            <!--light-box-files -->
-            <script type="text/javascript" charset="utf-8">
-                $(function () {
-                    $('.gallery-grid a').Chocolat();
-                });
-            </script>
-
-            <script src="js/bootstrap.min.js"></script>
-
-
+            <script src="ajax.js"></script>
+            <title>Biblioteca</title>
+            <link href = "css2/bootstrap.css" rel = "stylesheet" type = "text/css" media = "all">
+            <link href="css2/style.css" rel="stylesheet" type="text/css" media="all"/>
         </head>
         <body>
+            <div id="dialog-form" title="Crear nuevo autor">
+                <form>
+                    <fieldset>
+                        <label for="name">Nombre</label>
+                        <input type="text" name="name" id="name" value="" class="text ui-widget-content ui-corner-all">
+                        <input type="submit"  tabindex="-1" style="position:absolute; top:-1000px">
+                    </fieldset>
+                </form>
+            </div>
+
             <!--header start here-->
             <div class="banner2">
                 <div class="container">
@@ -119,68 +213,73 @@ if ($ok == 1) {
             <?php
             if ($q == 'add_book') {
                 ?>
-                <!--<div class="gallery" id="gallery">-->
-                    <div class="container">
-                        <!--<div class="gallery-main">-->
-                            <!--<div class="gallery-bott">-->
-                                <form enctype="multipart/form-data" action="libro_save.php" method="POST">
-                                    <div class="box box-success">
-                                        <br>
-                                            <h3 class="box-title">Información del libro</h3>
-<!--                                        <div class="box-header with-border">
-                                        </div>-->
-                                        <div class="box-body">
-                                            <input class="form-control input-lg" type="text" placeholder="Título">
-                                            <br>
-                                            <input class="form-control" type="text" placeholder="Descripción">
-                                            <br>
-                                            <select class="form-control select2" style="width: 100%;">
-                                                <option value="0" selected="selected">Elija un Autor</option>
-                                                <?php
-                                                foreach ($dbh->query("SELECT * from autor") as $fila) {
-                                                    ?>
-                                                    <option value="<?php echo $fila['id_autor']; ?>" ><?php echo $fila['nombre']; ?></option>
-                                                    <?php
-                                                }
-                                                ?>
-                                            </select>
-                                            <br>
-                                            <div class="box-header with-border" style="width: 100%;" >
-                                                <select class="form-control select2" style="width: 100%;" onchange="load(this.value)">
-                                                    <option value="0" selected="selected">Sistema Dewey de clasificación (1er nivel)</option>
-                                                    <?php
-                                                    foreach ($dbh->query("SELECT * from clasificacion where clasificacion > 0 order by id_clasificacion") as $fila) {
-                                                        ?>
-                                                        <option value="<?php echo $fila['id_clasificacion']; ?>" ><?php
-                                                            echo $fila['clasificacion'];
-                                                            echo " - ";
-                                                            echo $fila['descripcion']
-                                                            ?></option>
-                                                        <?php
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                            <br>
-                                            <div  id="myDiv"  style="width: 100%;" >
+                <div class="container">
+                    <form enctype="multipart/form-data" action="" method="POST">
+                        <div class="box box-success">
+                            <br>
+                            <h3 class="box-title">Información del libro</h3>
+                            <!--                                        <div class="box-header with-border">
+                                                                    </div>-->
+                            <div class="box-body">
+                                <input class="form-control input-lg" type="text" placeholder="Título">
+                                <br>
+                                <input class="form-control" type="text" placeholder="Descripción">
+                                <br>
 
-                                            </div>
-                                            <br>
-                                   
+                                <div id="myDiv2" style="float: left; width: 550px;" >
+                                    <select class="form-control select2" style="width: 100%;">
+                                        <option value="0" selected="selected">Elija un Autor</option>
+                                        <?php
+                                        foreach ($dbh->query("SELECT * from autor") as $fila) {
+                                            ?>
+                                            <option value="<?php echo $fila['id_autor']; ?>" ><?php echo $fila['nombre']; ?></option>
+                                            <?php
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
 
-                                            <div class = "form-group">
-                                                <label for = "exampleInputFile">Agregar portada</label>
-                                                <input type = "file" id = "exampleInputFile" >
-                                            </div>
-                                            <br>
-                                     
-                                            <button type = "button" class = "btn btn-block btn-primary">Guardar Libro</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
+
+
+                                <div style="float: left; width: 560px;" >
+                                    <a id="create-user" >Agregar Autor</a>
+                                </div> 
+
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <br>
+                                <div class="box-header with-border" style="width: 100%;" >
+                                    <select class="form-control select2" style="width: 100%;" onchange="load(this.value)">
+                                        <option value="0" selected="selected">Sistema Dewey de clasificación (1er nivel)</option>
+                                        <?php
+                                        foreach ($dbh->query("SELECT * from clasificacion where clasificacion > 0 order by id_clasificacion") as $fila) {
+                                            ?>
+                                            <option value="<?php echo $fila['id_clasificacion']; ?>" ><?php
+                                                echo $fila['clasificacion'];
+                                                echo " - ";
+                                                echo $fila['descripcion']
+                                                ?></option>
+                                            <?php
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <br>
+                                <div  id="myDiv"  style="width: 100%;" >
+
+                                </div>
+                                <br>
+
+
+                                <div class = "form-group">
+                                    <label for = "exampleInputFile">Agregar portada</label>
+                                    <input type = "file" id = "exampleInputFile" >
+                                </div>
+                                <br>
+
+                                <button type = "button" class = "btn btn-block btn-primary">Guardar Libro</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
                 <?php
@@ -257,12 +356,15 @@ if ($ok == 1) {
                                     }
                                 }
                                 ?>
+
                                 <div class="clearfix"> </div>
                             </div>
                         </div>
                     </div>
                 </div>
             <?php } ?>
+
+
         </body>
     </html>
     <?php
