@@ -113,21 +113,22 @@ if ($ok == 1) {
                         </div>
                     </form>
                     <br>
-                    <fieldset></fieldset>
+                    <!--<fieldset></fieldset>-->
                 </div>
             </div>
             <?php
             if ($q == 'add_book') {
                 ?>
-                <div class="gallery" id="gallery">
+                <!--<div class="gallery" id="gallery">-->
                     <div class="container">
-                        <div class="gallery-main">
-                            <div class="gallery-bott">
+                        <!--<div class="gallery-main">-->
+                            <!--<div class="gallery-bott">-->
                                 <form enctype="multipart/form-data" action="libro_save.php" method="POST">
                                     <div class="box box-success">
-                                        <div class="box-header with-border">
+                                        <br>
                                             <h3 class="box-title">Información del libro</h3>
-                                        </div>
+<!--                                        <div class="box-header with-border">
+                                        </div>-->
                                         <div class="box-body">
                                             <input class="form-control input-lg" type="text" placeholder="Título">
                                             <br>
@@ -144,11 +145,11 @@ if ($ok == 1) {
                                                 ?>
                                             </select>
                                             <br>
-                                            <div style="float: left; width: 350px;" >
+                                            <div class="box-header with-border" style="width: 100%;" >
                                                 <select class="form-control select2" style="width: 100%;" onchange="load(this.value)">
                                                     <option value="0" selected="selected">Sistema Dewey de clasificación (1er nivel)</option>
                                                     <?php
-                                                    foreach ($dbh->query("SELECT * from clasificacion order by id_clasificacion") as $fila) {
+                                                    foreach ($dbh->query("SELECT * from clasificacion where clasificacion > 0 order by id_clasificacion") as $fila) {
                                                         ?>
                                                         <option value="<?php echo $fila['id_clasificacion']; ?>" ><?php
                                                             echo $fila['clasificacion'];
@@ -160,26 +161,26 @@ if ($ok == 1) {
                                                     ?>
                                                 </select>
                                             </div>
-                                            <div id="myDiv"  style="float: left; width: 350px;" >
+                                            <br>
+                                            <div  id="myDiv"  style="width: 100%;" >
 
                                             </div>
                                             <br>
-                                            <br>
+                                   
 
                                             <div class = "form-group">
                                                 <label for = "exampleInputFile">Agregar portada</label>
                                                 <input type = "file" id = "exampleInputFile" >
                                             </div>
                                             <br>
-                                            <br>
-
+                                     
                                             <button type = "button" class = "btn btn-block btn-primary">Guardar Libro</button>
                                         </div>
                                     </div>
                                 </form>
-                            </div>
-                        </div>
-                    </div>
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
                 </div>
 
                 <?php
