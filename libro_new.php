@@ -40,11 +40,7 @@
                         Año
                         <input type="number"   name="anio"  size="80" required="" >
 
-                        Cantidad de Paginas
-                        <input type="number"   name="paginas" required=""  size="80" >
-                        <br>
-                        <br>
-
+                       
                         Categoria
                         <select name="id_categoria" required="">
                             <option value="1" >Categoria 1</option>
@@ -72,5 +68,21 @@
                 </div>
             </div>
         </div>
+        
+         <!-- Form Element sizes -->
+          <div class="box box-success">
+            <div class="box-header with-border">
+              <h3 class="box-title">Different Height</h3>
+            </div>
+            <div class="box-body">
+              <input class="form-control input-lg" type="text" placeholder=".input-lg">
+              <br>
+              <input class="form-control" type="text" placeholder="Default input">
+              <br>
+              <input class="form-control input-sm" type="text" placeholder=".input-sm">
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
     </body>
 </html>

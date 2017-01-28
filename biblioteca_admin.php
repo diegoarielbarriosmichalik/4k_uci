@@ -10,12 +10,23 @@ function f_remove_odd_characters($string) {
     return $string;
 }
 
+$dbh = new PDO('pgsql:host=localhost;port=5432;dbname=biblioteca;user=postgres;password=postgres');
+
 $ok = null;
 session_start();
 if ($_SESSION['last_access'] == "1") {
     $ok = 1;
     $menu = $_SESSION['menu'];
+    $privilegio = $_SESSION['privilegio'];
 }
+
+if ($privilegio == 1) {
+    $menu = 'menu_user.html';
+}
+if ($privilegio == 0) {
+    $menu = 'menu_alumnos.html';
+}
+
 $q = null; //Initialization value; Examples
 $q = isset($_GET['q']) ? $_GET['q'] : '';
 $q = !empty($_GET['q']) ? $_GET['q'] : '';
@@ -24,6 +35,8 @@ if ($ok == 1) {
     <!DOCTYPE HTML>
     <html>
         <head>
+            <script src="ajax.js"></script>
+
             <title>Biblioteca</title>
             <link href = "css2/bootstrap.css" rel = "stylesheet" type = "text/css" media = "all">
             <script src="js/jquery-1.11.0.min.js"></script>
@@ -45,11 +58,11 @@ if ($ok == 1) {
             <script type="text/javascript" src="js/easing.js"></script>
             <script type="text/javascript">
                 jQuery(document).ready(function ($) {
-                $(".scroll").click(function (event) {
-                event.preventDefault();
-                $('html,body').animate({scrollTop: $(this.hash).offset().top}, 1000);
+                    $(".scroll").click(function (event) {
+                        event.preventDefault();
+                        $('html,body').animate({scrollTop: $(this.hash).offset().top}, 1000);
+                    });
                 });
-            });
             </script>
             <!-- //end-smoth-scrolling -->
             <!--light-box-files -->
@@ -57,9 +70,9 @@ if ($ok == 1) {
             <link rel="stylesheet" href="css/chocolat.css" type="text/css" media="screen" charset="utf-8">
             <!--light-box-files -->
             <script type="text/javascript" charset="utf-8">
-    $(function () {
-        $('.gallery-grid a').Chocolat();
-    });
+                $(function () {
+                    $('.gallery-grid a').Chocolat();
+                });
             </script>
 
             <script src="js/bootstrap.min.js"></script>
@@ -71,7 +84,7 @@ if ($ok == 1) {
             <div class="banner2">
                 <div class="container">
                     <div class="header">
-    <?php include './header.html'; ?>        
+                        <?php include './header.html'; ?>        
                     </div>
                     <div class="top-nav">
                         <div class="navbar-header">
@@ -111,32 +124,64 @@ if ($ok == 1) {
                         <div class="gallery-main">
                             <div class="gallery-bott">
                                 <form enctype="multipart/form-data" action="libro_save.php" method="POST">
-                                    <strong> I.S.B.N.&nbsp; </strong> <input name="isbn" type="text" size="80" required="" placeholder="Ingrese ISBN"/> 
-                                    <br><br>
-                                    <strong> Título &nbsp; </strong>
-                                    <input type="text"   name="titulo"  size="80" required="" placeholder="Ingrese un titulo">
-                                    <br><br>
-                                    <strong> Descripción </strong>
-                                    <input type="text" name="subtitulo" size="76" required="" placeholder="" >
-                                    <br><br>
-                                    <strong> Autor </strong>
-                                    <select name="id_autor" required="">
-                                        <option value="" >Elija un autor</option>
-                                        <option value="1" >Autor 1</option>
-                                    </select>
-                                    <br><br>
-                                    <strong> Nro. de Páginas </strong>
-                                    <input type="number"   name="paginas" required=""  >
-                                    <br><br>
-                                    <input type="file" name="image"  required="" />
-                                    <br><br>
-                                    <input type="submit" value="Guardar" />
-                                    <br><br>
+                                    <div class="box box-success">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Información del libro</h3>
+                                        </div>
+                                        <div class="box-body">
+                                            <input class="form-control input-lg" type="text" placeholder="Título">
+                                            <br>
+                                            <input class="form-control" type="text" placeholder="Descripción">
+                                            <br>
+                                            <select class="form-control select2" style="width: 100%;">
+                                                <option value="0" selected="selected">Elija un Autor</option>
+                                                <?php
+                                                foreach ($dbh->query("SELECT * from autor") as $fila) {
+                                                    ?>
+                                                    <option value="<?php echo $fila['id_autor']; ?>" ><?php echo $fila['nombre']; ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                            <br>
+                                            <div style="float: left; width: 350px;" >
+                                                <select class="form-control select2" style="width: 100%;" onchange="load(this.value)">
+                                                    <option value="0" selected="selected">Sistema Dewey de clasificación (1er nivel)</option>
+                                                    <?php
+                                                    foreach ($dbh->query("SELECT * from clasificacion order by id_clasificacion") as $fila) {
+                                                        ?>
+                                                        <option value="<?php echo $fila['id_clasificacion']; ?>" ><?php
+                                                            echo $fila['clasificacion'];
+                                                            echo " - ";
+                                                            echo $fila['descripcion']
+                                                            ?></option>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                            <div id="myDiv"  style="float: left; width: 350px;" >
+
+                                            </div>
+                                            <br>
+                                            <br>
+
+                                            <div class = "form-group">
+                                                <label for = "exampleInputFile">Agregar portada</label>
+                                                <input type = "file" id = "exampleInputFile" >
+                                            </div>
+                                            <br>
+                                            <br>
+
+                                            <button type = "button" class = "btn btn-block btn-primary">Guardar Libro</button>
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <?php
             } else {
                 ?>
@@ -145,41 +190,68 @@ if ($ok == 1) {
                         <div class="gallery-main">
                             <div class="gallery-bott">
                                 <?php
-                                $contenido = null;
+//                                $contenido = null;
+//                                $contenido = isset($_POST['buscar']) ? $_POST['buscar'] : '';
+//                                $contenido = !empty($_POST['buscar']) ? $_POST['buscar'] : '';
+//                                if ($contenido != null) {
+//                                    $dbh = new PDO('pgsql:host=localhost;port=5432;dbname=biblioteca;user=postgres;password=postgres');
+//                                    foreach ($dbh->query(""
+//                                            . "SELECT * from libro "
+//                                            . "inner join editorial on editorial.id_editorial = libro.id_editorial "
+//                                            . "where titulo ilike '%$contenido%' ") as $fila) {
+//                                        $id = $fila['id_libro'];
+//                                        $exif = exif_read_data("images/" . $id . ".jpg", 'IFD0');
+//                                        $exif = exif_read_data("images/" . $id . ".jpg", 0, true);
+//                                        foreach ($exif as $clave => $sección) {
+//                                            foreach ($sección as $nombre => $var) {
+//                                                if (is_string($var)) {
+//                                                    $nuevo = f_remove_odd_characters($var);
+//                                                    $resultado = strpos($nuevo, $contenido);
+//                                                    if ($resultado !== FALSE) {
+//                                                        
+                                ?>
+                                <!--                                <div class="col-md-4 col1 gallery-grid">
+                                                                    <figure class="effect-bubba">
+                                                                        <img class="img-responsive" src="images///?php echo $fila['id_libro']; ?>.jpg" alt="">
+                                                                        <figcaption>
+                                                                            <h4 class="gal">//?php echo $fila['titulo']; ?></h4>
+                                                                            <p class="gal1">ISBN: //?php echo $fila['isbn']; ?></p>	
+                                                                            <p class="gal1">Editorial: //?php echo $fila['nombre']; ?></p>	
+                                                                            <p class="gal1">//?php echo $fila['num_pag']; ?>  Pag. </p>	
+                                                                        </figcaption>			
+                                                                    </figure>
+                                                                </div>-->
+                                <?php
+//                                                    }
+//                                                    $nuevo = "";
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                                
+                                ?>
+                                <?php
+                                $contenido = null; //Initialization value; Examples
                                 $contenido = isset($_POST['buscar']) ? $_POST['buscar'] : '';
                                 $contenido = !empty($_POST['buscar']) ? $_POST['buscar'] : '';
                                 if ($contenido != null) {
-                                    $dbh = new PDO('pgsql:host=localhost;port=5432;dbname=biblioteca;user=postgres;password=postgres');
-                                    foreach ($dbh->query(""
-                                            . "SELECT * from libro "
-                                            . "inner join editorial on editorial.id_editorial = libro.id_editorial "
-                                            . "where titulo ilike '%$contenido%' ") as $fila) {
-                                        $id = $fila['id_libro'];
-                                        $exif = exif_read_data("images/" . $id . ".jpg", 'IFD0');
-                                        $exif = exif_read_data("images/" . $id . ".jpg", 0, true);
-                                        foreach ($exif as $clave => $sección) {
-                                            foreach ($sección as $nombre => $var) {
-                                                if (is_string($var)) {
-                                                    $nuevo = f_remove_odd_characters($var);
-                                                    $resultado = strpos($nuevo, $contenido);
-                                                    if ($resultado !== FALSE) {
-                                                        ?>
-                                                        <div class="col-md-4 col1 gallery-grid">
-                                                            <figure class="effect-bubba">
-                                                                <img class="img-responsive" src="images/<?php echo $fila['id_libro']; ?>.jpg" alt="">
-                                                                <figcaption>
-                                                                    <h4 class="gal"><?php echo $fila['titulo']; ?></h4>
-                                                                    <p class="gal1">ISBN: <?php echo $fila['isbn']; ?></p>	
-                                                                    <p class="gal1">Editorial: <?php echo $fila['nombre']; ?></p>	
-                                                                    <p class="gal1"><?php echo $fila['num_pag']; ?>  Pag. </p>	
-                                                                </figcaption>			
-                                                            </figure>
-                                                        </div>
-                                                        <?php
-                                                    }
-                                                    $nuevo = "";
-                                                }
-                                            }
+                                    foreach ($dbh->query("SELECT * from libro inner join editorial on editorial.id_editorial = libro.id_editorial where titulo ilike '%$contenido%' ") as $fila) {
+                                        if ($fila['id_libro'] > 0) {
+                                            ?>
+                                            <div class="col-md-4 col1 gallery-grid">
+                                                <!--<a href="images/g1.jpg" rel="title" class="b-link-stripe b-animate-go  thickbox">-->
+                                                <figure class="effect-bubba">
+                                                    <img class="img-responsive" src="images/<?php echo $fila['id_libro']; ?>.jpg" alt="">
+                                                    <figcaption>
+                                                        <h4 class="gal"><?php echo $fila['titulo']; ?></h4>
+                                                        <p class="gal1">ISBN: <?php echo $fila['isbn']; ?></p>	
+                                                        <p class="gal1">Editorial: <?php echo $fila['nombre']; ?></p>	
+                                                        <p class="gal1"><?php echo $fila['num_pag']; ?>  Pag. </p>	
+                                                    </figcaption>			
+                                                </figure>
+                                            </div>
+                                            <?php
                                         }
                                     }
                                 }
@@ -189,7 +261,7 @@ if ($ok == 1) {
                         </div>
                     </div>
                 </div>
-    <?php } ?>
+            <?php } ?>
         </body>
     </html>
     <?php

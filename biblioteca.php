@@ -110,9 +110,6 @@ if ($ok == 1) {
                             $contenido = isset($_POST['buscar']) ? $_POST['buscar'] : '';
                             $contenido = !empty($_POST['buscar']) ? $_POST['buscar'] : '';
                             if ($contenido != null) {
-
-
-
                                 $dbh = new PDO('pgsql:host=localhost;port=5432;dbname=biblioteca;user=postgres;password=postgres');
                                 foreach ($dbh->query("SELECT * from libro inner join editorial on editorial.id_editorial = libro.id_editorial where titulo ilike '%$contenido%' ") as $fila) {
                                     ?>

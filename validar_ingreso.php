@@ -19,8 +19,9 @@ try {
         $si = '1';
         $_SESSION['last_access'] = "1";
         $_SESSION['menu'] = 'menu_alumnos.html';
+        $_SESSION['privilegio'] = '0';
     }
-    
+
     $sql = "SELECT * from users "
             . "where username = '$codigo' "
             . "and encrypted_password = '$clave' ";
@@ -30,6 +31,7 @@ try {
         $si = '1';
         $_SESSION['last_access'] = "1";
         $_SESSION['menu'] = 'menu_user.html';
+        $_SESSION['privilegio'] = '1';
     }
 
     if ($si == '0') {
