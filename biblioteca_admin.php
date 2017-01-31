@@ -97,12 +97,12 @@ if ($ok == 1) {
                         var valid = true;
                         allFields.removeClass("ui-state-error");
                         valid = valid && checkLength(name, "username", 3, 16);
-    //                        valid = valid && checkLength(email, "email", 6, 80);
-    //                        valid = valid && checkLength(password, "password", 5, 16);
+                        //                        valid = valid && checkLength(email, "email", 6, 80);
+                        //                        valid = valid && checkLength(password, "password", 5, 16);
 
                         valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter.");
-    //                        valid = valid && checkRegexp(email, emailRegex, "eg. ui@jquery.com");
-    //                        valid = valid && checkRegexp(password, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9");
+                        //                        valid = valid && checkRegexp(email, emailRegex, "eg. ui@jquery.com");
+                        //                        valid = valid && checkRegexp(password, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9");
 
                         if (valid) {
                             $("#users tbody").append("<tr>" +
@@ -158,6 +158,91 @@ if ($ok == 1) {
                     });
                 });
             </script>
+            <script>
+
+                $(function () {
+                    var dialog_editorial, form_editorial,
+                            // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
+                            emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+                            name = $("#name"),
+                            email = $("#email"),
+                            password = $("#password"),
+                            allFields = $([]).add(name).add(email).add(password),
+                            tips = $(".validateTips");
+                    function updateTips(t) {
+                        tips
+                                .text(t)
+                                .addClass("ui-state-highlight");
+                        setTimeout(function () {
+                            tips.removeClass("ui-state-highlight", 1500);
+                        }, 500);
+                    }
+
+                    function checkLength(o, n, min, max) {
+                        if (o.val().length > max || o.val().length < min) {
+                            o.addClass("ui-state-error");
+                            updateTips("Length of " + n + " must be between " +
+                                    min + " and " + max + ".");
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+
+                    function checkRegexp(o, regexp, n) {
+                        if (!(regexp.test(o.val()))) {
+                            o.addClass("ui-state-error");
+                            updateTips(n);
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+
+
+
+                    function Editorial_guardar() {
+
+                        var valid = true;
+                        allFields.removeClass("ui-state-error");
+                        valid = valid && checkLength(name, "username", 3, 16);
+                        valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter.");
+                        if (valid) {
+                            $.ajax({
+                                type: "POST",
+                                url: "Editorial_guardar.php",
+                                data: {nombre: name.val()}
+                            })
+                            load_autor_editorial()("0");
+                            dialog_editorial.dialog("close");
+                        }
+                    }
+
+                    dialog_editorial = $("#dialog-form-editorial").dialog({
+                        autoOpen: false,
+                        height: 400,
+                        width: 350,
+                        modal: true,
+                        buttons: {
+                            "Guardar": Editorial_guardar,
+                            Cancel: function () {
+                                dialog_editorial.dialog("close");
+                            }
+                        },
+                        close: function () {
+                            form_editorial[ 0 ].reset();
+                            allFields.removeClass("ui-state-error");
+                        }
+                    });
+                    form_editorial = dialog_editorial.find("form_editorial").on("submit", function (event) {
+                        event.preventDefault();
+                        addUser();
+                    });
+                    $("#create-user2").button().on("click", function () {
+                        dialog_editorial.dialog("open");
+                    });
+                });
+            </script>
             <script src="ajax.js"></script>
             <title>Biblioteca</title>
             <link href = "css2/bootstrap.css" rel = "stylesheet" type = "text/css" media = "all">
@@ -165,6 +250,15 @@ if ($ok == 1) {
         </head>
         <body>
             <div id="dialog-form" title="Crear nuevo autor">
+                <form>
+                    <fieldset>
+                        <label for="name">Nombre</label>
+                        <input type="text" name="name" id="name" value="" class="text ui-widget-content ui-corner-all">
+                        <input type="submit"  tabindex="-1" style="position:absolute; top:-1000px">
+                    </fieldset>
+                </form>
+            </div>
+            <div id="dialog-form-editorial" title="Crear nueva editorial">
                 <form>
                     <fieldset>
                         <label for="name">Nombre</label>
@@ -214,20 +308,22 @@ if ($ok == 1) {
             if ($q == 'add_book') {
                 ?>
                 <div class="container">
-                    <form enctype="multipart/form-data" action="" method="POST">
+                    <form enctype="multipart/form-data" action="libro_save.php" method="POST">
                         <div class="box box-success">
                             <br>
                             <h3 class="box-title">Información del libro</h3>
                             <!--                                        <div class="box-header with-border">
                                                                     </div>-->
                             <div class="box-body">
-                                <input class="form-control input-lg" type="text" placeholder="Título">
+                                <input name="titulo" class="form-control input-lg" type="text" placeholder="Título">
                                 <br>
-                                <input class="form-control" type="text" placeholder="Descripción">
+                                <input name="descripcion" class="form-control" type="text" placeholder="Descripción">
+                                <br>
+                                <input name="isbn" class="form-control input-sm" type="text" placeholder="ISBN">
                                 <br>
 
                                 <div id="myDiv2" style="float: left; width: 550px;" >
-                                    <select class="form-control select2" style="width: 100%;">
+                                    <select name="id_autor" class="form-control select2" style="width: 100%;">
                                         <option value="0" selected="selected">Elija un Autor</option>
                                         <?php
                                         foreach ($dbh->query("SELECT * from autor") as $fila) {
@@ -244,12 +340,30 @@ if ($ok == 1) {
                                 <div style="float: left; width: 560px;" >
                                     <a id="create-user" >Agregar Autor</a>
                                 </div> 
+                                <br>
+                                <br>
+                                <div id="myDiv_editorial" style="float: left; width: 550px;" >
+                                    <select name="id_editorial" class="form-control select2" style="width: 100%;">
+                                        <option value="0" selected="selected">Elija una Editorial</option>
+                                        <?php
+                                        foreach ($dbh->query("SELECT * from editorial") as $fila) {
+                                            ?>
+                                            <option value="<?php echo $fila['id_editorial']; ?>" ><?php echo $fila['nombre']; ?></option>
+                                            <?php
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
+                                <div style="float: left; width: 560px;" >
+                                    <a id="create-user2" >Agregar Editorial</a>
+                                </div> 
 
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <br>
                                 <div class="box-header with-border" style="width: 100%;" >
-                                    <select class="form-control select2" style="width: 100%;" onchange="load(this.value)">
-                                        <option value="0" selected="selected">Sistema Dewey de clasificación (1er nivel)</option>
+                                    <select name="id_clasificacion" class="form-control select2" style="width: 100%;" onchange="load(this.value)">
+                                        <option  value="0" selected="selected">Sistema Dewey de clasificación (1er nivel)</option>
                                         <?php
                                         foreach ($dbh->query("SELECT * from clasificacion where clasificacion > 0 order by id_clasificacion") as $fila) {
                                             ?>
@@ -276,7 +390,7 @@ if ($ok == 1) {
                                 </div>
                                 <br>
 
-                                <button type = "button" class = "btn btn-block btn-primary">Guardar Libro</button>
+                                <button type = "submit" class = "btn btn-block btn-primary">Guardar Libro</button>
                             </div>
                         </div>
                     </form>
@@ -335,21 +449,63 @@ if ($ok == 1) {
                                 $contenido = null; //Initialization value; Examples
                                 $contenido = isset($_POST['buscar']) ? $_POST['buscar'] : '';
                                 $contenido = !empty($_POST['buscar']) ? $_POST['buscar'] : '';
+                                if (!empty($_GET['contenido'])) {
+                                    $contenido = $_GET['contenido'];
+                                }
                                 if ($contenido != null) {
                                     foreach ($dbh->query("SELECT * from libro inner join editorial on editorial.id_editorial = libro.id_editorial where titulo ilike '%$contenido%' ") as $fila) {
                                         if ($fila['id_libro'] > 0) {
                                             ?>
-                                            <div class="col-md-4 col1 gallery-grid">
-                                                <!--<a href="images/g1.jpg" rel="title" class="b-link-stripe b-animate-go  thickbox">-->
-                                                <figure class="effect-bubba">
-                                                    <img class="img-responsive" src="images/<?php echo $fila['id_libro']; ?>.jpg" alt="">
-                                                    <figcaption>
-                                                        <h4 class="gal"><?php echo $fila['titulo']; ?></h4>
-                                                        <p class="gal1">ISBN: <?php echo $fila['isbn']; ?></p>	
-                                                        <p class="gal1">Editorial: <?php echo $fila['nombre']; ?></p>	
-                                                        <p class="gal1"><?php echo $fila['num_pag']; ?>  Pag. </p>	
-                                                    </figcaption>			
-                                                </figure>
+                                            <div class="box-footer">
+
+                                                <form action="libro_cometario.php" method="POST">
+                                                    <div class="col-md-4 col1 gallery-grid">
+                                                        <!--<a href="images/g1.jpg" rel="title" class="b-link-stripe b-animate-go  thickbox">-->
+                                                        <figure class="effect-bubba">
+
+                                                            <?php if ($fila['img'] == 0) { ?>
+                                                                <img class="img-responsive" src="images/0.jpg" alt="">
+                                                                <?php
+                                                            } else {
+                                                                ?>
+                                                                <img class="img-responsive" src="images/<?php echo $fila['id_libro']; ?>.jpg" alt="">
+                                                                <?php
+                                                            }
+                                                            ?>
+
+                                                            <figcaption>
+                                                                <h4 class="gal"><?php echo $fila['titulo']; ?></h4>
+                                                                <p class="gal1">ISBN: <?php echo $fila['isbn']; ?></p>	
+                                                                <p class="gal1">Editorial: <?php echo $fila['nombre']; ?></p>	
+                                                                <p class="gal1"><?php echo $fila['num_pag']; ?>  Pag. </p>	
+                                                            </figcaption>			
+                                                        </figure>
+                                                        <div class="img-push">
+                                                            <br>
+                                                        </div>
+                                                        <div class="img-push">
+                                                            <input name="id_libro" value="<?php echo $fila['id_libro']; ?>" hidden="true" >
+                                                            <input type="text"  name="comentario" class="form-control input-sm" placeholder="Ingrese un comentario...">
+                                                            <input hidden="true" type="text" name="contenido" value="<?php echo $contenido; ?>">
+                                                            <input type="submit" hidden="true" >
+
+                                                            <?php
+                                                            foreach ($dbh->query("SELECT * from comentario "
+                                                                    . " where id_libro = '" . $fila['id_libro'] . "' "
+                                                                    . " order by id_comentario DESC") as $fila2) {
+                                                                ?>
+                                                                <div class="box box-solid">
+                                                                    <div class="box-body">
+                                                                        <blockquote>
+                                                                            <p><?php echo $fila2['comentario']; ?></p>
+                                                                            <small> <cite title="Source Title">Nombre del Alumno</cite></small>
+                                                                        </blockquote>
+                                                                    </div>
+                                                                </div>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </div>
+                                                </form>
                                             </div>
                                             <?php
                                         }
